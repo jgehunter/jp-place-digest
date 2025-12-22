@@ -4,6 +4,11 @@ __pycache__/
 *.pyo
 *.pyd
 *.log
+dist/
+build/
+.mypy_cache/
+.pytest_cache/
+ruff_cache/
 
 # Virtual env
 .venv/
@@ -23,4 +28,6 @@ alembic/__pycache__/
 .env
 .env.local
 
-pgdata/
+jp_digest_pgdata/
+
+*.log

@@ -1,0 +1,81 @@
+trip:
+  title: "Japan Shikoku"
+  bases:
+    - name: "Kyoto"
+      radius_km: 25
+      aliases: ["Kyoto City", "京都"]
+      queries:
+        - "Kyoto cafe"
+        - "Kyoto restaurant"
+        - "Kyoto hidden gems"
+        - "Gion coffee"
+        - "Uji matcha"
+        - "Fushimi Inari"
+    - name: "Takamatsu"
+      radius_km: 35
+      aliases: ["Takamatsu City", "高松", "Naoshima"]
+      queries:
+        - "Takamatsu udon"
+        - "Ritsurin Garden"
+        - "Naoshima art"
+        - "Naoshima cafe"
+        - "Takamatsu hidden gems"
+        - "Takamatsu cafe"
+        - "Shikoku hidden gems"
+    - name: "Iya Valley"
+      radius_km: 50
+      aliases: ["Iya Valley", "祖谷渓", "Iya", "Iya Valley Tokushima", "大歩危", "小歩危", "かずら橋"]
+      queries:
+        - "Iya Valley Ryokan"
+        - "Iya Valley Vine Bridge"
+        - "Oboke Koboke"
+        - "Kazurabashi"
+        - "Iya Valley onsen"
+        - "Iya Valley hike"
+        - "Iya Valley hidden gems"
+        - "Iya Valley nature"
+        - "Iya Valley village"
+    - name: "Matsuyama"
+      radius_km: 40
+      aliases: ["Matsuyama City", "松山", "Dogo Onsen", "Matsuyama Ehime"]
+      queries:
+        - "Matsuyama castle"
+        - "Dogo Onsen"
+        - "Matsuyama hidden gems"
+        - "Matsuyama cafe"
+        - "Matsuyama food"
+        - "Shikoku hidden gems"
+    - name: "Tokyo"
+      radius_km: 30
+      aliases: ["Tokyo", "東京", "Shibuya", "Daikanyama", "Omotesando", "Shimokitazawa", "Jimbocho", "Shinjuku", "Asakusa", "Koenji"]
+      queries:
+        - "Tokyo cafe"
+        - "Tokyo restaurant"
+        - "Tokyo hidden gems"
+        - "Shibuya cafe"
+        - "Shinjuku food"
+        - "Asakusa sightseeing"
+        - "Daikanyama cafe"
+        - "Omotesando architecture"
+        - "Shimokitazawa vintage"
+        - "Jimbocho bookstores"
+        - "Shibuya hidden gems"
+
+reddit:
+  subreddits:
+    - "JapanTravel"
+    - "JapanTravelTips"
+    - "traveljapan"
+    - "travel"
+    - "JapanPics"
+    - "JapanLife"
+    - "Tokyo"
+    - "Kyoto"
+    - "Shikoku"
+  time_filter: "month" # year|month|week
+  limit_per_query: 3
+
+digest:
+  max_places_per_base: 8
+  max_examples_per_place: 3
+  min_place_score: 1.5

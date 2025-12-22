@@ -1,0 +1,15 @@
+Metadata-Version: 2.4
+Name: jp-digest
+Version: 0.1.0
+Summary: Weekly digest of grounded travel POIs from Reddit.
+Requires-Python: >=3.11
+Requires-Dist: pydantic>=2.7
+Requires-Dist: pydantic-settings>=2.3
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: httpx>=0.27
+Requires-Dist: tenacity>=8.3
+Requires-Dist: sqlalchemy>=2.0
+Requires-Dist: alembic>=1.13
+Requires-Dist: psycopg[binary]>=3.1
+Requires-Dist: python-dotenv>=1.0
+Requires-Dist: openai>=1.40.0
