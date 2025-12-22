@@ -40,6 +40,7 @@ class ContentItem(Base):
 
     title: Mapped[str | None] = mapped_column(Text, nullable=True)
     body: Mapped[str] = mapped_column(Text, nullable=False)
+    raw_json: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     num_comments: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
@@ -70,16 +71,11 @@ class Experience(Base):
         ForeignKey("content_items.id"), index=True, nullable=False
     )
 
-    polarity: Mapped[str] = mapped_column(
-        String(16), nullable=False
-    )  # positive|negative|neutral
-    activity_type: Mapped[str] = mapped_column(
-        String(32), nullable=False
-    )  # restaurant|cafe|activity|hotel|landmark|other
+    polarity: Mapped[str] = mapped_column(String(16), nullable=False)
+    activity_type: Mapped[str] = mapped_column(String(32), nullable=False)
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
 
-    # Minimal MVP: string list serialized as "; "
     place_mentions: Mapped[str] = mapped_column(Text, nullable=False, default="")
 
     extracted_at: Mapped[datetime] = mapped_column(
