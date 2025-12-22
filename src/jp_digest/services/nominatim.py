@@ -15,6 +15,7 @@ POI_USER_AGENT = os.environ.get("POI_USER_AGENT", "jp-digest/0.1")
 class PoiCandidate:
     poi_id: str
     name: str
+    display_name: str | None
     lat: float
     lon: float
     address: str | None
@@ -48,6 +49,7 @@ def search(query: str, limit: int = 5) -> list[PoiCandidate]:
             PoiCandidate(
                 poi_id=poi_id,
                 name=d.get("name") or (display.split(",")[0] if display else query),
+                display_name=display,
                 lat=float(d["lat"]),
                 lon=float(d["lon"]),
                 address=display,

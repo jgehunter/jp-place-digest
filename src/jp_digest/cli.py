@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-import time
 
 from sqlalchemy import select
 
@@ -75,7 +74,7 @@ def cmd_ingest(cfg_path: str) -> None:
                         # Commit after each post to save progress incrementally
                         s.commit()
                         print(
-                            f"✓ Saved post + {len(comments)} comments (total: {added})"
+                            f"Saved post + {len(comments)} comments (total: {added})"
                         )
 
     print(f"Ingested {added} new content items.")

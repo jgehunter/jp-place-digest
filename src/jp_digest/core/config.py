@@ -22,8 +22,12 @@ class TripCfg(BaseModel):
 class RedditCfg(BaseModel):
     subreddits: list[str] = Field(default_factory=lambda: ["JapanTravel"])
     time_filter: str = "year"
+    time_filters: list[str] = Field(default_factory=list)
     limit_per_query: int = 25
-    max_comments_per_post: int = 12
+    search_pages: int = 2
+    sort: str = "top"
+    pause_seconds: float = 2.0
+    max_comments_per_post: int = 20
 
 
 class DigestCfg(BaseModel):

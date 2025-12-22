@@ -103,7 +103,7 @@ def build_weekly_digest(cfg: AppCfg) -> str:
                 ):
                     if shown >= cfg.digest.max_experiences_per_place:
                         break
-                    lines.append(f"   - ✅ {exp['summary']}")
+                    lines.append(f"   - {exp['summary']}")
                     lines.append(f"     _[Source]({exp['url']})_")
                     shown += 1
 
@@ -111,7 +111,7 @@ def build_weekly_digest(cfg: AppCfg) -> str:
                 for exp in sorted(neutral_exps, key=lambda x: x["score"], reverse=True):
                     if shown >= cfg.digest.max_experiences_per_place:
                         break
-                    lines.append(f"   - ℹ️ {exp['summary']}")
+                    lines.append(f"   - {exp['summary']}")
                     lines.append(f"     _[Source]({exp['url']})_")
                     shown += 1
 
@@ -120,7 +120,7 @@ def build_weekly_digest(cfg: AppCfg) -> str:
                     lines.append("")
                     lines.append("   **Warnings:**")
                     for exp in negative_exps[:2]:
-                        lines.append(f"   - ⚠️ {exp['summary']}")
+                        lines.append(f"   - {exp['summary']}")
                         lines.append(f"     _[Source]({exp['url']})_")
 
                 lines.append("")

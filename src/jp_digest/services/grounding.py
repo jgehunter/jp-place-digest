@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 
 from jp_digest.core.config import AppCfg, BaseCfg
+from jp_digest.core.textnorm import mention_matches_candidate, normalize
 from jp_digest.services.nominatim import haversine_km, search
 from jp_digest.storage.db import session_scope
 from jp_digest.storage.models import (
@@ -14,6 +15,23 @@ from jp_digest.storage.models import (
     ExperiencePoi,
     Poi,
 )
+
+
+BAD_TYPES = {
+    "administrative",
+    "city",
+    "county",
+    "state",
+    "region",
+    "providence",
+    "neighbourhood",
+    "suburb",
+    "hamlet",
+    "locality",
+    "yes",
+    "stop",
+}
+BAD_CATEGORY = {"boundary", "place", "administrative", "railway"}
 
 
 @dataclass(frozen=True)
@@ -44,7 +62,11 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
     - assign POI to base with distance
     """
     centers = []
+    base_like = set()
     for b in cfg.trip.bases:
+        base_like.add(normalize(b.name))
+        for a in b.aliases:
+            base_like.add(normalize(a))
         bc = _base_center(b)
         if bc:
             centers.append(bc)
@@ -95,6 +117,12 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                     q = f"{m}, {bc.base_name}, Japan"
                     candidates = search(q, limit=4)
                     for c in candidates:
+                        if (c.category or "").lower() in BAD_CATEGORY:
+                            continue
+                        if (c.type or "").lower() in BAD_TYPES:
+                            continue
+                        if not mention_matches_candidate(m, c.name, c.display_name):
+                            continue
                         dist = haversine_km(bc.lat, bc.lon, c.lat, c.lon)
                         if dist > bc.radius_km:
                             continue
@@ -106,6 +134,12 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                     continue
 
                 cand, bc, dist_km, _ = best
+
+                norm_m = normalize(m)
+                if norm_m == normalize(bc.base_name):
+                    continue
+                if norm_m in base_like:
+                    continue
 
                 # Upsert POI
                 poi = s.get(Poi, cand.poi_id)
