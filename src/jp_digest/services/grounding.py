@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import cos, pi
 
 from sqlalchemy import select
 
@@ -16,14 +17,13 @@ from jp_digest.storage.models import (
     Poi,
 )
 
-
 BAD_TYPES = {
     "administrative",
     "city",
     "county",
     "state",
     "region",
-    "providence",
+    "province",
     "neighbourhood",
     "suburb",
     "hamlet",
@@ -31,7 +31,41 @@ BAD_TYPES = {
     "yes",
     "stop",
 }
-BAD_CATEGORY = {"boundary", "place", "administrative", "railway"}
+BAD_CATEGORY = {"boundary", "place", "administrative", "railway", "highway", "waterway"}
+
+ALLOWED_CATEGORIES = {"tourism", "leisure", "historic", "shop"}
+ALLOWED_TYPES = {
+    "restaurant",
+    "cafe",
+    "fast_food",
+    "bar",
+    "pub",
+    "izakaya",
+    "bakery",
+    "confectionery",
+    "museum",
+    "gallery",
+    "attraction",
+    "viewpoint",
+    "park",
+    "garden",
+    "zoo",
+    "aquarium",
+    "temple",
+    "shrine",
+    "castle",
+    "marketplace",
+    "spa",
+    "hot_spring",
+    "trail",
+    "bridge",
+    "monument",
+    "hotel",
+    "hostel",
+    "guest_house",
+    "theatre",
+    "cinema",
+}
 
 
 @dataclass(frozen=True)
@@ -42,15 +76,62 @@ class BaseCenter:
     radius_km: float
 
 
+def _viewbox_for_radius(
+    lat: float, lon: float, radius_km: float
+) -> tuple[float, float, float, float]:
+    lat_delta = radius_km / 111.0
+    lon_delta = radius_km / (111.0 * cos(lat * pi / 180.0))
+    left = lon - lon_delta
+    right = lon + lon_delta
+    top = lat + lat_delta
+    bottom = lat - lat_delta
+    return (left, top, right, bottom)
+
+
 def _base_center(base: BaseCfg) -> BaseCenter | None:
-    # Resolve base city once per run
-    candidates = search(f"{base.name}, Japan", limit=1)
+    candidates = search(f"{base.name}, Japan", limit=1, countrycodes="jp")
     if not candidates:
         return None
     c = candidates[0]
     return BaseCenter(
         base_name=base.name, lat=c.lat, lon=c.lon, radius_km=base.radius_km
     )
+
+
+def _allowed_candidate(category: str, place_type: str) -> bool:
+    if category in BAD_CATEGORY or place_type in BAD_TYPES:
+        return False
+    if place_type in ALLOWED_TYPES:
+        return True
+    if category in ALLOWED_CATEGORIES:
+        return True
+    return False
+
+
+def _build_base_terms(cfg: AppCfg) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for b in cfg.trip.bases:
+        terms = [normalize(b.name)]
+        terms.extend([normalize(a) for a in b.aliases])
+        out[b.name] = [t for t in terms if t]
+    return out
+
+
+def _content_mentions_any(content_norm: str, terms: list[str]) -> bool:
+    return any(t in content_norm for t in terms)
+
+
+def _content_mentions_other_base(
+    content_norm: str, base_terms: dict[str, list[str]], target_base: str
+) -> bool:
+    if _content_mentions_any(content_norm, base_terms.get(target_base, [])):
+        return False
+    for name, terms in base_terms.items():
+        if name == target_base:
+            continue
+        if _content_mentions_any(content_norm, terms):
+            return True
+    return False
 
 
 def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
@@ -63,6 +144,7 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
     """
     centers = []
     base_like = set()
+    base_terms = _build_base_terms(cfg)
     for b in cfg.trip.bases:
         base_like.add(normalize(b.name))
         for a in b.aliases:
@@ -72,14 +154,11 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
             centers.append(bc)
 
     if not centers:
-        raise RuntimeError("Could not resolve any base centers bia Nominatim.")
+        raise RuntimeError("Could not resolve any base centers via Nominatim.")
 
     created = 0
     with session_scope() as s:
-        # Track base assignments we've added in this session to avoid duplicates
         seen_base_pois = set()
-
-        # Pre-load existing base assignments into the set
         existing_assignments = s.execute(select(BaseAssignment)).scalars().all()
         for ba in existing_assignments:
             seen_base_pois.add((ba.base_name, ba.poi_id))
@@ -101,8 +180,10 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
             if not mentions:
                 continue
 
+            ci = s.get(ContentItem, e.content_item_id)
+            content_norm = normalize(((ci.title or "") + " " + (ci.body or ""))) if ci else ""
+
             for m in mentions:
-                # Already linked?
                 existing = s.execute(
                     select(ExperiencePoi).where(
                         ExperiencePoi.experience_id == e.id,
@@ -112,14 +193,26 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                 if existing:
                     continue
 
-                best = None  # (candiate, base_center, dist_km, key)
+                best = None  # (candidate, base_center, dist_km, key)
                 for bc in centers:
+                    if content_norm and _content_mentions_other_base(
+                        content_norm, base_terms, bc.base_name
+                    ):
+                        continue
+
                     q = f"{m}, {bc.base_name}, Japan"
-                    candidates = search(q, limit=4)
+                    viewbox = _viewbox_for_radius(bc.lat, bc.lon, bc.radius_km)
+                    candidates = search(
+                        q,
+                        limit=6,
+                        countrycodes="jp",
+                        viewbox=viewbox,
+                        bounded=True,
+                    )
                     for c in candidates:
-                        if (c.category or "").lower() in BAD_CATEGORY:
-                            continue
-                        if (c.type or "").lower() in BAD_TYPES:
+                        cand_category = (c.category or "").lower()
+                        cand_type = (c.place_type or "").lower()
+                        if not _allowed_candidate(cand_category, cand_type):
                             continue
                         if not mention_matches_candidate(m, c.name, c.display_name):
                             continue
@@ -141,7 +234,6 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                 if norm_m in base_like:
                     continue
 
-                # Upsert POI
                 poi = s.get(Poi, cand.poi_id)
                 if poi is None:
                     poi = Poi(
@@ -154,7 +246,6 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                         category=cand.category,
                     )
                     s.add(poi)
-                    # Flush immediately so the POI exists before we reference it
                     s.flush()
 
                 s.add(
@@ -166,7 +257,6 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                     )
                 )
 
-                # Check if we've already added this base assignment (in DB or in this session)
                 base_poi_key = (bc.base_name, poi.poi_id)
                 if base_poi_key not in seen_base_pois:
                     s.add(

@@ -66,8 +66,12 @@ reddit:
     - "Tokyo"
     - "Kyoto"
     - "Shikoku"
-  time_filter: "month" # year|month|week
+  time_filter: "month"
+  time_filters: ["month", "year"]
   limit_per_query: 3
+  search_pages: 2
+  sort: "top"
+  pause_seconds: 2.0
 
 digest:
   max_places_per_base: 8

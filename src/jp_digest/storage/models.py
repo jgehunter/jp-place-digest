@@ -76,6 +76,11 @@ class Experience(Base):
     summary: Mapped[str] = mapped_column(Text, nullable=False)
     confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
 
+    recommendation_score: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0.0
+    )
+    evidence: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     place_mentions: Mapped[str] = mapped_column(Text, nullable=False, default="")
 
     extracted_at: Mapped[datetime] = mapped_column(

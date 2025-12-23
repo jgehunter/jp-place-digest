@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from math import atan2, cos, pi, sin, sqrt
+from typing import Iterable
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential_jitter
@@ -20,18 +21,39 @@ class PoiCandidate:
     lon: float
     address: str | None
     category: str | None
+    place_type: str | None
     importance: float
 
 
+def _format_viewbox(viewbox: Iterable[float] | None) -> str | None:
+    if not viewbox:
+        return None
+    left, top, right, bottom = viewbox
+    return f"{left},{top},{right},{bottom}"
+
+
 @retry(wait=wait_exponential_jitter(initial=1, max=10), stop=stop_after_attempt(4))
-def search(query: str, limit: int = 5) -> list[PoiCandidate]:
+def search(
+    query: str,
+    limit: int = 5,
+    countrycodes: str | None = "jp",
+    viewbox: Iterable[float] | None = None,
+    bounded: bool = False,
+) -> list[PoiCandidate]:
     url = "https://nominatim.openstreetmap.org/search"
     params = {
         "q": query,
         "format": "jsonv2",
         "addressdetails": 1,
         "limit": limit,
-    }  # Fixed: jsonv -> jsonv2
+    }
+    if countrycodes:
+        params["countrycodes"] = countrycodes
+    viewbox_str = _format_viewbox(viewbox)
+    if viewbox_str:
+        params["viewbox"] = viewbox_str
+        params["bounded"] = 1 if bounded else 0
+
     headers = {"User-Agent": POI_USER_AGENT}
 
     with httpx.Client(headers=headers, timeout=25.0) as client:
@@ -53,7 +75,8 @@ def search(query: str, limit: int = 5) -> list[PoiCandidate]:
                 lat=float(d["lat"]),
                 lon=float(d["lon"]),
                 address=display,
-                category=str(d.get("type") or d.get("category") or ""),
+                category=str(d.get("class") or d.get("category") or ""),
+                place_type=str(d.get("type") or ""),
                 importance=float(d.get("importance") or 0.0),
             )
         )

@@ -45,8 +45,8 @@ def _sleep(pause_seconds: float) -> None:
 
 
 @retry(
-    stop=stop_after_attempt(6),
-    wait=wait_exponential(multiplier=2, min=60, max=600),
+    stop=stop_after_attempt(8),
+    wait=wait_exponential(multiplier=30, min=30, max=900),
     retry=retry_if_exception_type(
         (httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError)
     ),
@@ -94,7 +94,7 @@ def search_posts(
     limit: int,
     pages: int = 1,
     sort: str = "top",
-    pause_seconds: float = 2.0,
+    pause_seconds: float = 3.0,
 ) -> list[dict]:
     results: list[dict] = []
     after: str | None = None
@@ -118,8 +118,8 @@ def search_posts(
 
 
 @retry(
-    stop=stop_after_attempt(6),
-    wait=wait_exponential(multiplier=2, min=60, max=600),
+    stop=stop_after_attempt(8),
+    wait=wait_exponential(multiplier=30, min=30, max=900),
     retry=retry_if_exception_type(
         (httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError)
     ),
@@ -127,7 +127,7 @@ def search_posts(
     reraise=True,
 )
 def fetch_post_and_top_comments(
-    permalink: str, max_comments: int, pause_seconds: float = 2.0
+    permalink: str, max_comments: int, pause_seconds: float = 3.0
 ) -> tuple[RedditItem, list[RedditItem]]:
     url = f"https://www.reddit.com{permalink}.json"
     with httpx.Client(headers=_headers(), timeout=25.0) as client:

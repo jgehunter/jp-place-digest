@@ -68,10 +68,12 @@ def rank_places_for_base(cfg: AppCfg, base_name: str) -> list[RankedPlace]:
             pop = 0.0
             conf = 0.0
             pol = 0.0
+            rec = 0.0
             for e in exps[: cfg.digest.max_experiences_per_place * 2]:
                 ci = s.get(ContentItem, e.content_item_id)
                 pop += log1p(max(0, int(ci.score if ci else 0)))
                 conf += float(e.confidence or 0.5)
+                rec += float(getattr(e, "recommendation_score", 0.0) or 0.0)
                 if e.polarity == "positive":
                     pol += 1.0
                 elif e.polarity == "negative":
@@ -79,14 +81,23 @@ def rank_places_for_base(cfg: AppCfg, base_name: str) -> list[RankedPlace]:
 
             dist = dist_by_poi.get(poi_id, 999.0)
             proximity = max(0.0, 1.0 - (dist / 50.0))
+            rec_avg = rec / max(1, len(exps))
 
             # Simple deterministic baseline score:
-            score = 0.9 * count + 1.2 * pop + 0.8 * conf + 1.0 * proximity + pol
+            score = (
+                0.9 * count
+                + 1.2 * pop
+                + 0.8 * conf
+                + 1.6 * rec_avg
+                + 1.0 * proximity
+                + pol
+            )
 
             reasons = [
                 f"mentions={count}",
                 f"pop={pop:.2f}",
                 f"conf={conf:.2f}",
+                f"rec_avg={rec_avg:.2f}",
                 f"dist_km={dist:.2f}",
                 f"pol={pol:.2f}",
             ]
