@@ -6,7 +6,7 @@ from math import cos, pi
 from sqlalchemy import select
 
 from jp_digest.core.config import AppCfg, BaseCfg
-from jp_digest.core.textnorm import mention_matches_candidate, normalize
+from jp_digest.core.textnorm import normalize
 from jp_digest.services.nominatim import haversine_km, search
 from jp_digest.storage.db import session_scope
 from jp_digest.storage.models import (
@@ -17,54 +17,21 @@ from jp_digest.storage.models import (
     Poi,
 )
 
-BAD_TYPES = {
+# Only exclude extremely obvious administrative/geographic entities
+EXCLUDE_TYPES = {
     "administrative",
     "city",
     "county",
     "state",
     "region",
     "province",
-    "neighbourhood",
-    "suburb",
-    "hamlet",
-    "locality",
-    "yes",
-    "stop",
+    "country",
+    "continent",
 }
-BAD_CATEGORY = {"boundary", "place", "administrative", "railway", "highway", "waterway"}
 
-ALLOWED_CATEGORIES = {"tourism", "leisure", "historic", "shop"}
-ALLOWED_TYPES = {
-    "restaurant",
-    "cafe",
-    "fast_food",
-    "bar",
-    "pub",
-    "izakaya",
-    "bakery",
-    "confectionery",
-    "museum",
-    "gallery",
-    "attraction",
-    "viewpoint",
-    "park",
-    "garden",
-    "zoo",
-    "aquarium",
-    "temple",
-    "shrine",
-    "castle",
-    "marketplace",
-    "spa",
-    "hot_spring",
-    "trail",
-    "bridge",
-    "monument",
-    "hotel",
-    "hostel",
-    "guest_house",
-    "theatre",
-    "cinema",
+EXCLUDE_CATEGORIES = {
+    "boundary",
+    "place",  # Often just admin boundaries
 }
 
 
@@ -98,13 +65,16 @@ def _base_center(base: BaseCfg) -> BaseCenter | None:
     )
 
 
-def _allowed_candidate(category: str, place_type: str) -> bool:
-    if category in BAD_CATEGORY or place_type in BAD_TYPES:
-        return False
-    if place_type in ALLOWED_TYPES:
+def _is_obviously_wrong(category: str, place_type: str) -> bool:
+    """Only filter out obvious administrative boundaries and generic places."""
+    category = category.lower().strip()
+    place_type = place_type.lower().strip()
+
+    if category in EXCLUDE_CATEGORIES:
         return True
-    if category in ALLOWED_CATEGORIES:
+    if place_type in EXCLUDE_TYPES:
         return True
+
     return False
 
 
@@ -117,23 +87,6 @@ def _build_base_terms(cfg: AppCfg) -> dict[str, list[str]]:
     return out
 
 
-def _content_mentions_any(content_norm: str, terms: list[str]) -> bool:
-    return any(t in content_norm for t in terms)
-
-
-def _content_mentions_other_base(
-    content_norm: str, base_terms: dict[str, list[str]], target_base: str
-) -> bool:
-    if _content_mentions_any(content_norm, base_terms.get(target_base, [])):
-        return False
-    for name, terms in base_terms.items():
-        if name == target_base:
-            continue
-        if _content_mentions_any(content_norm, terms):
-            return True
-    return False
-
-
 def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
     """
     For each Experience with place_mentions:
@@ -141,10 +94,13 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
     - pick best match inside radius
     - link Experience -> POI
     - assign POI to base with distance
+
+    Simplified version: trust Nominatim search and only exclude obvious errors.
     """
     centers = []
     base_like = set()
     base_terms = _build_base_terms(cfg)
+
     for b in cfg.trip.bases:
         base_like.add(normalize(b.name))
         for a in b.aliases:
@@ -157,6 +113,10 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
         raise RuntimeError("Could not resolve any base centers via Nominatim.")
 
     created = 0
+    skipped_no_match = 0
+    skipped_base_name = 0
+    skipped_obvious_error = 0
+
     with session_scope() as s:
         seen_base_pois = set()
         existing_assignments = s.execute(select(BaseAssignment)).scalars().all()
@@ -173,17 +133,23 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
             .all()
         )
 
-        for e in exps:
+        total = len(exps)
+        print(f"  Processing {total} experiences...")
+
+        for idx, e in enumerate(exps, 1):
             mentions = [
                 m.strip() for m in (e.place_mentions or "").split(";") if m.strip()
             ]
             if not mentions:
                 continue
 
-            ci = s.get(ContentItem, e.content_item_id)
-            content_norm = normalize(((ci.title or "") + " " + (ci.body or ""))) if ci else ""
+            if idx % 10 == 0 or idx == 1:
+                print(
+                    f"  [{idx}/{total}] Grounding experience {e.id} with {len(mentions)} mentions"
+                )
 
             for m in mentions:
+                # Skip if already grounded
                 existing = s.execute(
                     select(ExperiencePoi).where(
                         ExperiencePoi.experience_id == e.id,
@@ -193,47 +159,51 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                 if existing:
                     continue
 
-                best = None  # (candidate, base_center, dist_km, key)
-                for bc in centers:
-                    if content_norm and _content_mentions_other_base(
-                        content_norm, base_terms, bc.base_name
-                    ):
-                        continue
+                # Check if mention is just a base name
+                norm_m = normalize(m)
+                if norm_m in base_like:
+                    skipped_base_name += 1
+                    continue
 
+                best = None  # (candidate, base_center, dist_km, importance)
+
+                for bc in centers:
+                    # Search for this mention near this base
                     q = f"{m}, {bc.base_name}, Japan"
                     viewbox = _viewbox_for_radius(bc.lat, bc.lon, bc.radius_km)
                     candidates = search(
                         q,
-                        limit=6,
+                        limit=10,
                         countrycodes="jp",
                         viewbox=viewbox,
                         bounded=True,
                     )
+
                     for c in candidates:
-                        cand_category = (c.category or "").lower()
-                        cand_type = (c.place_type or "").lower()
-                        if not _allowed_candidate(cand_category, cand_type):
+                        cand_category = c.category or ""
+                        cand_type = c.place_type or ""
+
+                        # Only filter out obvious errors
+                        if _is_obviously_wrong(cand_category, cand_type):
                             continue
-                        if not mention_matches_candidate(m, c.name, c.display_name):
-                            continue
+
+                        # Check distance
                         dist = haversine_km(bc.lat, bc.lon, c.lat, c.lon)
                         if dist > bc.radius_km:
                             continue
+
+                        # Pick best by importance, then proximity
                         key = (c.importance, -dist)
                         if best is None or key > best[3]:
                             best = (c, bc, dist, key)
 
                 if best is None:
+                    skipped_no_match += 1
                     continue
 
                 cand, bc, dist_km, _ = best
 
-                norm_m = normalize(m)
-                if norm_m == normalize(bc.base_name):
-                    continue
-                if norm_m in base_like:
-                    continue
-
+                # Create or get POI
                 poi = s.get(Poi, cand.poi_id)
                 if poi is None:
                     poi = Poi(
@@ -248,6 +218,7 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                     s.add(poi)
                     s.flush()
 
+                # Link experience to POI
                 s.add(
                     ExperiencePoi(
                         experience_id=e.id,
@@ -257,6 +228,7 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
                     )
                 )
 
+                # Assign POI to base if not already assigned
                 base_poi_key = (bc.base_name, poi.poi_id)
                 if base_poi_key not in seen_base_pois:
                     s.add(
@@ -270,4 +242,9 @@ def ground_experiences(cfg: AppCfg, limit_experiences: int = 400) -> int:
 
                 created += 1
 
+    print(f"\n  Grounding Summary:")
+    print(f"    ✓ Successfully grounded: {created}")
+    print(f"    ⊙ No match found: {skipped_no_match}")
+    print(f"    ⊙ Base names skipped: {skipped_base_name}")
+    print(f"    ⊙ Obvious errors filtered: {skipped_obvious_error}")
     return created

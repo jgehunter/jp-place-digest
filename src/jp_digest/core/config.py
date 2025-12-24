@@ -28,6 +28,8 @@ class RedditCfg(BaseModel):
     sort: str = "top"
     pause_seconds: float = 2.0
     max_comments_per_post: int = 20
+    min_comment_length: int = 150
+    min_comment_score: int = 5
 
 
 class DigestCfg(BaseModel):

@@ -19,6 +19,8 @@ from jp_digest.storage.models import ContentItem
 def cmd_ingest(cfg_path: str) -> None:
     cfg = load_config(cfg_path)
     added = 0
+    skipped_comments = 0
+    skipped_existing_posts = 0
     time_filters = cfg.reddit.time_filters or [cfg.reddit.time_filter]
 
     total_queries = sum(
@@ -52,8 +54,25 @@ def cmd_ingest(cfg_path: str) -> None:
                             if h.get("kind") != "t3":
                                 continue
                             d = h["data"]
+                            post_id = d.get("id")
                             permalink = d.get("permalink")
-                            if not permalink:
+                            if not permalink or not post_id:
+                                continue
+
+                            # Check if this post already exists before fetching comments
+                            post_source_id = f"t3_{post_id}"
+                            existing_post = s.execute(
+                                select(ContentItem).where(
+                                    ContentItem.source == "reddit",
+                                    ContentItem.source_id == post_source_id,
+                                )
+                            ).scalar_one_or_none()
+
+                            if existing_post:
+                                skipped_existing_posts += 1
+                                print(
+                                    f"  [{idx}/{len(hits)}] ⊙ Already have: {permalink}"
+                                )
                                 continue
 
                             print(f"  [{idx}/{len(hits)}] Fetching: {permalink}")
@@ -66,6 +85,17 @@ def cmd_ingest(cfg_path: str) -> None:
 
                             new_items = 0
                             for item in [post, *comments]:
+                                # Filter low-quality comments based on config
+                                if item.kind == "comment":
+                                    if len(item.body) < cfg.reddit.min_comment_length:
+                                        skipped_comments += 1
+                                        continue
+
+                                    if item.score < cfg.reddit.min_comment_score:
+                                        skipped_comments += 1
+                                        continue
+
+                                # Double-check individual items (comments might still be new)
                                 exists = s.execute(
                                     select(ContentItem).where(
                                         ContentItem.source == "reddit",
@@ -103,9 +133,16 @@ def cmd_ingest(cfg_path: str) -> None:
                                     f"  ✓ Saved {new_items} new items (total: {added})"
                                 )
                             else:
-                                print(f"  ⊙ All items already exist (total: {added})")
+                                print(f"  ⊙ No new items from this post")
 
-    print(f"\n✅ Ingestion complete! Added {added} new content items.")
+    print(f"\n✅ Ingestion complete!")
+    print(f"   Added {added} new content items.")
+    if skipped_existing_posts > 0:
+        print(
+            f"   Skipped {skipped_existing_posts} posts already in database (saved time!)."
+        )
+    if skipped_comments > 0:
+        print(f"   Filtered out {skipped_comments} low-quality comments.")
 
 
 def cmd_extract(reextract_all: bool = False) -> None:

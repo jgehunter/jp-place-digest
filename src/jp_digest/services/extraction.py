@@ -4,58 +4,12 @@ import json
 
 from sqlalchemy import delete, select
 
-from jp_digest.core.textnorm import normalize, tokens
 from jp_digest.services.llm import extract_experiences
 from jp_digest.storage.db import session_scope
 from jp_digest.storage.models import ContentItem, Experience, ExperiencePoi
 
 
-_GENERIC_NAMES = {
-    "tokyo",
-    "kyoto",
-    "osaka",
-    "japan",
-    "shikoku",
-    "kagawa",
-    "ehime",
-    "tokushima",
-    "shibuya",
-    "shinjuku",
-    "asakusa",
-    "gion",
-}
-
-_GENERIC_TOKENS = {
-    "city",
-    "prefecture",
-    "ward",
-    "district",
-    "station",
-    "area",
-    "region",
-    "neighborhood",
-    "train",
-    "shinkansen",
-    "jr",
-    "metro",
-    "line",
-    "bus",
-}
-
-_GENERIC_CHAINS = {
-    "7 eleven",
-    "7 11",
-    "seven eleven",
-    "familymart",
-    "lawson",
-    "uniqlo",
-    "gu",
-    "loft",
-}
-
 _ALLOWED_POLARITY = {"positive", "negative"}
-_MIN_POSITIVE_SCORE = 6.0
-_MIN_NEGATIVE_SCORE = 7.0
 _MAX_EVIDENCE = 2
 
 
@@ -78,28 +32,6 @@ TEXT:
 """.strip()
         + "\n"
     )
-
-
-def _is_actionable_mention(mention: str) -> bool:
-    nm = normalize(mention)
-    if not nm or nm in _GENERIC_NAMES:
-        return False
-    if any(t in _GENERIC_TOKENS for t in tokens(mention)):
-        return False
-    if len(tokens(mention)) == 0:
-        return False
-    for chain in _GENERIC_CHAINS:
-        if chain in nm:
-            return False
-    return True
-
-
-def _clamp_score(value: object) -> float:
-    try:
-        score = float(value)  # type: ignore[arg-type]
-    except (TypeError, ValueError):
-        return 0.0
-    return max(0.0, min(10.0, score))
 
 
 def _clean_evidence(value: object) -> list[str]:
@@ -155,7 +87,11 @@ def extract_for_new_content(limit: int = 120, reextract_all: bool = False) -> in
             item_created = 0
 
             for e in payload.get("experiences", []):
+                # Basic validation only - trust the LLM to follow instructions
                 mentions = e.get("place_mentions") or []
+                if not mentions:
+                    continue
+
                 summary = str(e.get("summary") or "").strip()
                 if not summary:
                     continue
@@ -164,20 +100,18 @@ def extract_for_new_content(limit: int = 120, reextract_all: bool = False) -> in
                 if polarity not in _ALLOWED_POLARITY:
                     continue
 
-                rec_score = _clamp_score(e.get("recommendation_score"))
-                if polarity == "positive" and rec_score < _MIN_POSITIVE_SCORE:
-                    continue
-                if polarity == "negative" and rec_score < _MIN_NEGATIVE_SCORE:
-                    continue
+                # Use LLM's scores as-is (they should follow the schema)
+                rec_score = float(e.get("recommendation_score", 0.0))
+                rec_score = max(0.0, min(10.0, rec_score))
 
+                conf = float(e.get("confidence", 0.5))
+                conf = max(0.0, min(1.0, conf))
+
+                # Clean up mentions
                 mentions = [str(m).strip() for m in mentions if str(m).strip()]
-                mentions = [m for m in mentions if _is_actionable_mention(m)]
-                mentions = list(dict.fromkeys(mentions))
+                mentions = list(dict.fromkeys(mentions))  # Remove duplicates
                 if not mentions:
                     continue
-
-                conf = float(e.get("confidence") or 0.5)
-                conf = max(0.0, min(1.0, conf))
 
                 evidence = _clean_evidence(e.get("evidence"))
                 evidence_json = (

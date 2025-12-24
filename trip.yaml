@@ -3,77 +3,54 @@ trip:
   bases:
     - name: "Kyoto"
       radius_km: 25
-      aliases: ["Kyoto City"]
+      aliases: []
       queries:
-        - "Kyoto cafe"
-        - "Kyoto restaurant"
-        - "Kyoto hidden gems"
-        - "Gion coffee"
-        - "Uji matcha"
-        - "Fushimi Inari"
+        - "Kyoto best temples"
     - name: "Takamatsu"
       radius_km: 35
-      aliases: ["Takamatsu City", "Naoshima"]
+      aliases: ["Naoshima", "Shikoku"]
       queries:
-        - "Takamatsu udon"
+        - "best udon Takamatsu"
         - "Ritsurin Garden"
-        - "Naoshima art"
-        - "Naoshima cafe"
-        - "Takamatsu hidden gems"
-        - "Takamatsu cafe"
-        - "Shikoku hidden gems"
+        - "Naoshima art island guide"
     - name: "Iya Valley"
       radius_km: 50
-      aliases: ["Iya Valley", "Iya", "Iya Valley Tokushima", "Oboke", "Koboke", "Kazurabashi"]
+      aliases: ["Iya", "Tokushima", "Oboke", "Koboke", "Kazurabashi"]
       queries:
-        - "Iya Valley"
-        - "Kazurabashi"
-        - "Oboke"
-        - "Koboke"
-        - "Iya vine bridge"
-        - "Ochiai village"
+        - "Kazurabashi vine bridge"
+        - "Oboke gorge"
+        - "Iya Valley onsen"
     - name: "Matsuyama"
       radius_km: 40
-      aliases: ["Matsuyama City", "Dogo Onsen", "Matsuyama Ehime"]
+      aliases: ["Ehime"]
       queries:
-        - "Matsuyama"
-        - "Dogo Onsen"
-        - "Ishiteji"
-        - "Botchan"
-        - "Matsuyama cafe"
+        - "Dogo Onsen experience"
+        - "best onsen Matsuyama"
     - name: "Tokyo"
       radius_km: 30
-      aliases: ["Tokyo", "Shibuya", "Daikanyama", "Omotesando", "Shimokitazawa", "Jimbocho", "Shinjuku", "Asakusa", "Koenji"]
+      aliases: ["Shibuya", "Daikanyama", "Omotesando", "Shimokitazawa", "Jimbocho", "Shinjuku", "Asakusa", "Koenji"]
       queries:
-        - "Tokyo cafe"
-        - "Tokyo restaurant"
-        - "Tokyo hidden gems"
-        - "Shibuya cafe"
-        - "Shinjuku food"
-        - "Asakusa sightseeing"
+        - "Shimokitazawa vintage shops"
         - "Daikanyama cafe"
-        - "Omotesando architecture"
-        - "Shimokitazawa vintage"
-        - "Jimbocho bookstores"
-        - "Shibuya hidden gems"
+        - "Jimbocho bookstore guide"
+
 
 reddit:
   subreddits:
     - "JapanTravel"
     - "JapanTravelTips"
     - "travel"
-    - "JapaneseFood"
-    - "Tokyo"
-    - "Kyoto"
-    - "Shikoku"
   time_filter: "month"
   time_filters: ["month", "year"]
-  limit_per_query: 3
+  limit_per_query: 5
   search_pages: 2
   sort: "top"
-  pause_seconds: 2.0
+  pause_seconds: 1.0  # Reduced from 2.0 for faster ingestion
+  max_comments_per_post: 15
+  min_comment_length: 150
+  min_comment_score: 5
 
 digest:
-  max_places_per_base: 8
-  max_experiences_per_place: 3
+  max_places_per_base: 10
+  max_experiences_per_place: 4
   min_place_score: 1.5

@@ -119,7 +119,7 @@ def search_posts(
 
 @retry(
     stop=stop_after_attempt(8),
-    wait=wait_exponential(multiplier=30, min=30, max=900),
+    wait=wait_exponential(exp_base=10, multiplier=1, min=90, max=300),
     retry=retry_if_exception_type(
         (httpx.HTTPStatusError, httpx.TimeoutException, httpx.ConnectError)
     ),
@@ -129,9 +129,13 @@ def search_posts(
 def fetch_post_and_top_comments(
     permalink: str, max_comments: int, pause_seconds: float = 3.0
 ) -> tuple[RedditItem, list[RedditItem]]:
+    """
+    Fetch a post and its top comments.
+    Now uses shorter delay (1 second) to speed up ingestion.
+    """
     url = f"https://www.reddit.com{permalink}.json"
     with httpx.Client(headers=_headers(), timeout=25.0) as client:
-        r = client.get(url, params={"limit": max_comments, "sort": "top"})
+        r = client.get(url, params={"limit": max_comments, "sort": "relevance"})
         r.raise_for_status()
         payload = r.json()
 
@@ -174,5 +178,6 @@ def fetch_post_and_top_comments(
             )
         )
 
-    _sleep(pause_seconds)
+    # Reduced delay from 2-3 seconds to 1 second for faster ingestion
+    _sleep(min(1.0, pause_seconds))
     return post, comments

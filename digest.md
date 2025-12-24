@@ -1,80 +1,107 @@
 # Weekly Digest: Japan Shikoku
-_Generated: 2025-12-23T04:38:51Z_
+_Generated: 2025-12-24T17:35:37Z_
 
 ## Kyoto
-1. **Hyatt Place Kyoto**
-   - **Score**: 23.2 | **Category**: tourism | **Distance**: 0.92 km
+1. **伏見稲荷**
+   - **Score**: 49.0 | **Category**: railway | **Distance**: 7.40 km
 
    **Why Visit:**
-   - Stayed at Hyatt Place Kyoto using Hyatt points; noted it is above the Kyoto subway and would stay again.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1ikz4ys/assorted_tips_from_a_recent_trip/)_
-   - Stayed at Hyatt Place Kyoto: accessible room was large and flat; no electric bed was available.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1pjnxyf/wheelchair_accessibility_in_japan/)_
-   - User says they love staying at Hyatt Place and recommends staying at Hyatt Centric Kanazawa on a future trip.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1ikz4ys/assorted_tips_from_a_recent_trip/mbrjyum/)_
+   - Arrived at Fushimi Inari around 7:30 AM and completed the full hike through the torii paths.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Fushimi Inari around 10am when it was crowded at the base but less crowded higher up; walked through the torii path to the top.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1hvxrpn/trip_report_summer_in_tokyokyotoosaka/)_
+   - Visited Fushimi Inari in Kyoto late morning/early afternoon and explored a less-crowded bamboo forest detour.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1oqovga/trip_report_for_12_nights_in_japan_i_had_an/)_
+   - Visited Fushimi Inari around 9:30 pm, walked up to the top and noted views halfway and at the summit.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
 
-2. **Studios Ghibli shop**
-   - **Score**: 19.9 | **Category**: tourism | **Distance**: 2.06 km
+   **Warnings:**
+   - Visited Fushimi Inari and hiked the trails with many stairs; it took about half a day and left the author and partner exhausted.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1pdci8o/first_time_in_japan_december_10_days_itinerary/ns7iwdd/)_
 
-   **Why Visit:**
-   - At Ghibli Museum, exhibit attendants had pamphlets with English translations; this helped since photos aren’t allowed and signage wasn’t easy to read in English.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1jcz8ls/random_useful_japan_tips_i_dont_see_posted_about/)_
-
-3. **Uniqlo**
-   - **Score**: 18.0 | **Category**: shop | **Distance**: 3.38 km
-
-   **Why Visit:**
-   - Uniqlo clothing sizes run about one size larger than expected; GU had some of the same shirts for about half the price.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1k66z28/tips_i_havent_seen/)_
-   - Notes that Uniqlo sizing varies by build; suggests trying items on since Asian sizing fit was off for their fiance.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1k66z28/tips_i_havent_seen/monmq0c/)_
-
-4. **Kiyomizu Slope**
-   - **Score**: 16.9 | **Category**: amenity | **Distance**: 2.43 km
+2. **嵐山竹林**
+   - **Score**: 39.4 | **Category**: landuse | **Distance**: 8.67 km
 
    **Why Visit:**
-   - Visited Kiyomizu-dera at night during illuminations and found the lit trees memorable.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1iy47pq/my_11_days_in_japan_and_the_mistakes_i_made/)_
-   - Visit Kiyomizu-dera in Kyoto.
-     _[Source](https://www.reddit.com/r/JapanTravel/comments/1l4nhbh/firsttime_japan_trip_16_days_in_julyaugust_too/)_
+   - Visited Arashiyama Bamboo Grove early, walked to Adashino Nenbutsu-ji, and saw Togetsukyo Bridge before taking a bus to Philosopher's Path.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Arashiyama Bamboo Grove and Kameyama Park Observation Point on June 16.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
+   - Visited Arashiyama's Bamboo Forest and several nearby temples and sights starting around 9:30 am.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
 
-5. **7-Eleven**
-   - **Score**: 10.6 | **Category**: shop | **Distance**: 0.57 km
-
-   **Why Visit:**
-   - After buying coffee at 7-Eleven in Tokyo, they carried the cup around for about 3 hours because public trash cans were hard to find; konbini bins were available when purchasing items.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1iyes70/1_week_into_my_japan_trip_this_is_what_ive_learned/)_
-
-6. **鈴 三年坂夢子 Rinn Sannenzaka Yumeko**
-   - **Score**: 8.2 | **Category**: building | **Distance**: 2.06 km
+3. **錦市場**
+   - **Score**: 39.0 | **Category**: amenity | **Distance**: 8.33 km
 
    **Why Visit:**
-   - Walk Sannenzaka around sunset.
-     _[Source](https://www.reddit.com/r/JapanTravel/comments/1l4nhbh/firsttime_japan_trip_16_days_in_julyaugust_too/)_
-   - Walked Sannenzaka and Ninenzaka early morning after Kiyomizu-dera while shops were still closed, which made it easier to take photos before crowds.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1p4aglg/tokyo_kyoto_in_6_days/)_
+   - Stopped by Nishiki Market for lunch, sampling sushi, tempura, bubble tea, chocolate-dipped strawberries, and sweet rice balls.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Nishiki Market, walked through sampling food and bought a chef's knife at reasonable prices.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1hvxrpn/trip_report_summer_in_tokyokyotoosaka/)_
+   - Visited Nishiki Market and the nearby outdoor shopping streets, which were a big hit with the children.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1mmpri8/trip_report_family_vacation_17_days_in_june_2025/)_
 
-7. **高台寺茶寮 Kodaiji Saryo**
-   - **Score**: 6.7 | **Category**: amenity | **Distance**: 1.53 km
-
-   **Why Visit:**
-   - Walked south via Honenin, Eikando, Nanzenji and Kodaiji, ending at Kiyomizudera; crowds became intense around the Ninenzaka area.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1ppixte/trip_reportadvice_early_december_in/)_
-
-8. **Sushi Tetsu Pontocho**
-   - **Score**: 6.7 | **Category**: amenity | **Distance**: 0.47 km
+4. **伏見稲荷大社 境内案内図**
+   - **Score**: 31.5 | **Category**: tourism | **Distance**: 8.00 km
 
    **Why Visit:**
-   - Have dinner in Pontocho.
-     _[Source](https://www.reddit.com/r/JapanTravel/comments/1l4nhbh/firsttime_japan_trip_16_days_in_julyaugust_too/)_
+   - Took a bus to Fushimi Inari shrine, saw the gates and found it beautiful but very busy.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1nygjzm/30_days_in_japan/)_
+   - Hiked Fushimi Inari Shrine at sunset and noted there are fewer people further up, making photos easier.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1nbpdtg/three_weeks_in_japan_overview_and_thoughts/)_
+
+5. **金閣寺**
+   - **Score**: 30.2 | **Category**: amenity | **Distance**: 8.50 km
+
+   **Why Visit:**
+   - Visited Kinkaku-ji in Kyoto on June 15.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
+   - Went to Kinkaku-ji in the afternoon when the sun was out and found it especially worthwhile despite crowds.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
+
+6. **平安神宮**
+   - **Score**: 27.9 | **Category**: amenity | **Distance**: 7.50 km
+
+   **Why Visit:**
+   - Visited Heian Jingu during a Kyoto walking route before having a late lunch.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
+   - Visited Heian Shrine and encountered a flea market nearby while seeing the first cherry blossom of the trip.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1js5jcp/trip_report_12_days_in_march_with_elderly_parents/)_
+
+7. **京都御所**
+   - **Score**: 27.7 | **Category**: historic | **Distance**: 7.50 km
+
+   **Why Visit:**
+   - Visited Kyoto Imperial Palace as part of a day that included Kan'in-no-miya Residence and Heian Shrine.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1js5jcp/trip_report_12_days_in_march_with_elderly_parents/)_
+   - Walked through the quiet backstreets and the spacious grounds of Kyoto Imperial Palace en route to Yamadamatsu incense shop.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1jbg4zq/fall_2024_trip_report_tokyo_and_kyoto/)_
+
+8. **龍安寺**
+   - **Score**: 26.9 | **Category**: tourism | **Distance**: 8.00 km
+
+   **Why Visit:**
+   - Visited Ryoan-ji late in the morning after checking out of the hotel and described the visit as cathartic.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
+   - Visited and saw the rock garden at Ryoan-ji in Kyoto; described it as the best thing they saw there.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1l8a8kw/6_adults_1_epic_japan_tripwhat_are_we_missing/mx3jhm0/)_
+
+9. **先斗町通**
+   - **Score**: 24.3 | **Category**: highway | **Distance**: 9.00 km
+
+   **Why Visit:**
+   - Went to Pontocho Alley most nights for dinner and drinks, enjoyed the atmosphere and multiple whiskey bars.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1hvxrpn/trip_report_summer_in_tokyokyotoosaka/)_
+
+10. **ウトロ平和祈念館**
+   - **Score**: 24.2 | **Category**: tourism | **Distance**: 9.00 km
+
+   **Why Visit:**
+   - Spent the morning at the Peace Memorial Museum in Hiroshima during a day trip.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
 
 ## Takamatsu
-1. **のぞみ幼稚園 (Nozomi ES)**
-   - **Score**: 11.6 | **Category**: amenity | **Distance**: 5.65 km
-
-   **Why Visit:**
-   - Found paying extra for the green car on the Nozomi from Tokyo to Kyoto worth it for a quiet, comfortable ride.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1ikz4ys/assorted_tips_from_a_recent_trip/)_
+- No grounded high-signal places yet. Try ingesting more or widening queries.
 
 ## Iya Valley
 - No grounded high-signal places yet. Try ingesting more or widening queries.
@@ -83,68 +110,104 @@ _Generated: 2025-12-23T04:38:51Z_
 - No grounded high-signal places yet. Try ingesting more or widening queries.
 
 ## Tokyo
-1. **Shibuya Sky**
-   - **Score**: 21.5 | **Category**: tourism | **Distance**: 5.94 km
+1. **金龍山 浅草寺**
+   - **Score**: 63.6 | **Category**: amenity | **Distance**: 7.67 km
 
    **Why Visit:**
-   - Visited Shibuya Sky and felt it was worth the time despite a packed itinerary day.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1iy47pq/my_11_days_in_japan_and_the_mistakes_i_made/)_
-   - Visited Shibuya Sky at night and recommends booking an advance ticket for the time slot.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1p4aglg/tokyo_kyoto_in_6_days/)_
-   - Booked Shibuya Sky via KKDay and needed to reserve about a month in advance due to high demand.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1p3jzg8/one_year_since_japan_my_personal_tips_and_advice/)_
+   - Visited Senso-ji Temple in Asakusa, tried the fortune-telling paper and bought an amulet.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Walked through Senso-ji multiple times between the Airbnb and the train, visiting both early morning and when it's crowded.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1hvxrpn/trip_report_summer_in_tokyokyotoosaka/)_
+   - Visited Senso-Ji Temple in Asakusa and walked Nakamise Shopping Street as part of the Asakusa day.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1oqovga/trip_report_for_12_nights_in_japan_i_had_an/)_
+   - Visited Senso-ji in Asakusa as part of the June 10 itinerary.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
 
-2. **Mandarake**
-   - **Score**: 18.5 | **Category**: shop | **Distance**: 6.21 km
-
-   **Why Visit:**
-   - For browsing gay doujinshi, they found Mandarake (in Nakano City) had a more diverse selection than Akihabara, which they said was mostly straight hentai.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1jcz8ls/random_useful_japan_tips_i_dont_see_posted_about/)_
-   - Suggested Mandarake (Nakano) as a better place to browse gay doujinshi, with a more diverse selection.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1jcz8ls/random_useful_japan_tips_i_dont_see_posted_about/mi6kipi/)_
-
-3. **Sotetsu Fresa Inn Shimbashi-Hibiyaguchi**
-   - **Score**: 15.3 | **Category**: tourism | **Distance**: 1.11 km
+2. **teamLab Borderless Museum**
+   - **Score**: 47.7 | **Category**: tourism | **Distance**: 8.75 km
 
    **Why Visit:**
-   - Stayed at Sotetsu in Takadanobaba; found it convenient and easy to get around via the Yamanote Line.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1iy47pq/my_11_days_in_japan_and_the_mistakes_i_made/)_
-   - Booked the Sotetsu in Takadanobaba for an upcoming trip; the commenter feels it seems like a good choice based on another review.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1iy47pq/my_11_days_in_japan_and_the_mistakes_i_made/mesbnsn/)_
+   - Visited Teamlab Borderless in the evening in Tokyo; described it as a surreal experience.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Teamlab Borderless with a reserved time slot and enjoyed immersive exhibits including a waterfall and interactive fish drawing.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1jmpzno/8_days_in_japan_with_my_60_year_old_parents_train/)_
+   - Visited Teamlab Borderless in the afternoon after walking through Hamarikyu Gardens and nearby parks; described it as "so much fun."
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1kwuz5x/2_weeks_tokyo_report/)_
+   - Visited Teamlab Borderless during the Tokyo leg of the trip.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1mmpri8/trip_report_family_vacation_17_days_in_june_2025/)_
 
-4. **TAMAYA**
-   - **Score**: 11.1 | **Category**: amenity | **Distance**: 4.49 km
-
-   **Why Visit:**
-   - Ate okonomiyaki at Tamaya in Hiroshima; rated it their best okonomiyaki on the trip.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1hpw65m/30_days_in_japan_for_my_honeymoon_finished_it_and/)_
-
-5. **PEACE PARK本郷2丁目第2**
-   - **Score**: 11.0 | **Category**: amenity | **Distance**: 3.19 km
+3. **明治神宮**
+   - **Score**: 38.9 | **Category**: emergency | **Distance**: 8.33 km
 
    **Why Visit:**
-   - Went to Peace Park next to the Nagasaki Atomic Bomb Museum; described as well-maintained.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1hpw65m/30_days_in_japan_for_my_honeymoon_finished_it_and/)_
+   - Visited Meiji Jingu Shrine, spent time in Shinjuku Gyoen, saw Hachiko Statue and Scramble Crossing, and noted views from 7F of Magnet by Shibuya 109.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Meiji Jingu while in Harajuku/Shibuya on June 12.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
+   - Visited Meiji Shrine after Senso-ji and enjoyed the site, stating an intention to return next time.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1js5jcp/trip_report_12_days_in_march_with_elderly_parents/)_
 
-6. **teamLab Borderless Museum**
-   - **Score**: 10.6 | **Category**: tourism | **Distance**: 2.66 km
-
-   **Why Visit:**
-   - Bought tickets to teamLab Borderless the day before visiting and it was easy/no stress.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1pcklrc/how_did_you_plan_your_trip/ns15dv9/)_
-   - Visited Teamlab Borderless; thought it was cool but found it a bit busy.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1ppixte/trip_reportadvice_early_december_in/)_
-
-7. **GU**
-   - **Score**: 10.2 | **Category**: shop | **Distance**: 4.96 km
+4. **新宿御苑**
+   - **Score**: 38.0 | **Category**: emergency | **Distance**: 8.00 km
 
    **Why Visit:**
-   - Uniqlo clothing sizes run about one size larger than expected; GU had some of the same shirts for about half the price.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1k66z28/tips_i_havent_seen/)_
+   - Visited Meiji Jingu Shrine, spent time in Shinjuku Gyoen, saw Hachiko Statue and Scramble Crossing, and noted views from 7F of Magnet by Shibuya 109.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ki9ajf/just_came_back_from_japan_and_what_an_awesome/)_
+   - Visited Shinjuku Gyoen National Garden during the Shinjuku day on June 13.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
+   - Visited Shinjuku Gyoen National Garden during light rain; it was not very busy.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1mp4zw4/trip_report_12_days_in_japan_solo_alcoholics/)_
 
-8. **Loft**
-   - **Score**: 10.2 | **Category**: shop | **Distance**: 3.95 km
+5. **東京スカイツリー**
+   - **Score**: 30.8 | **Category**: building | **Distance**: 8.50 km
 
    **Why Visit:**
-   - Items like magnets at Loft felt overpriced, while some niche items seemed worth buying.
-     _[Source](https://www.reddit.com/r/JapanTravelTips/comments/1k66z28/tips_i_havent_seen/)_
+   - Visited Tokyo Skytree during the Asakusa day on June 10.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1lhmzam/tokyokyotohakone_june_2025_trip_report/)_
+   - Joined a 1:00 Tokyo Free Walking Tour at Sensoji Temple, then walked to Tokyo Skytree and bought a ticket to go inside.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1kwuz5x/2_weeks_tokyo_report/)_
+
+6. **東京大学コミュニケーションセンター**
+   - **Score**: 30.6 | **Category**: shop | **Distance**: 8.50 km
+
+   **Why Visit:**
+   - Visited Tōdai-ji in Nara and attended the Festival of Lights there in the evening.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1nbpdtg/three_weeks_in_japan_overview_and_thoughts/)_
+   - Visited Todai-ji during a day trip to Nara and described it as absolutely magnificent.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1ir136m/january_2025_trip_report/)_
+
+7. **中野ブロードウェイ**
+   - **Score**: 29.0 | **Category**: building | **Distance**: 7.50 km
+
+   **Why Visit:**
+   - Went to Nakano Broadway for anime and found it the best place encountered for stores and tech items.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1nygjzm/30_days_in_japan/)_
+   - Visited Nakano Broadway in Tokyo, found many shops closed but still bought a figurine.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1izly5h/trip_report_feb_2025_15_day_trip_sapporo_hakodate/)_
+
+8. **日本学士院**
+   - **Score**: 28.6 | **Category**: office | **Distance**: 8.00 km
+
+   **Why Visit:**
+   - Walked around Ueno Park, saw a few sakura trees in bloom and obtained a shrine stamp.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1jmpzno/8_days_in_japan_with_my_60_year_old_parents_train/)_
+   - Visited Ueno Park and explored nearby Yanaka and the fabric town north of it.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1j5pvag/first_trip_to_japan_was_amazingso_im_doing_it/mgka448/)_
+
+9. **東急ステイ築地**
+   - **Score**: 27.1 | **Category**: tourism | **Distance**: 8.00 km
+
+   **Why Visit:**
+   - Stayed at Tokyu Stay Tsukiji; room had AC and an in-room washer/dryer which they used to pack light and do laundry during the trip.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1kwuz5x/2_weeks_tokyo_report/)_
+   - Stayed at Tokyu Stay Tsukiji beginning May 7 for about a week and used the in-unit washer and dryer.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1kwuz5x/2_weeks_tokyo_report/mukvvt9/)_
+
+10. **江戸東京たてもの園**
+   - **Score**: 25.2 | **Category**: tourism | **Distance**: 7.50 km
+
+   **Why Visit:**
+   - Visited Edo-Tokyo Open Air Architectural Museum, enjoyed beautiful cherry trees and low crowds despite a long trip.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1js5jcp/trip_report_12_days_in_march_with_elderly_parents/)_
+   - Explored west Tokyo along the Chuo line and encountered attractions like the Tokyo Open Air Museum.
+     _[Source](https://www.reddit.com/r/JapanTravel/comments/1oqovga/trip_report_for_12_nights_in_japan_i_had_an/nnlpxg3/)_
