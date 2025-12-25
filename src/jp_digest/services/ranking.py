@@ -26,20 +26,20 @@ W_FEEDBACK = 0.0
 
 TYPE_PRIOR = {
     "restaurant": 1.2,
-    "cafe": 1.15,
-    "bar": 1.05,
+    "cafe": 1.2,
+    "bar": 1.0,
     "onsen": 1.15,
-    "museum": 0.9,
-    "temple": 0.85,
-    "shrine": 0.85,
-    "hike": 1.0,
-    "shop": 1.0,
-    "activity": 1.0,
-    "hotel": 0.95,
-    "landmark": 0.95,
+    "museum": 1.0,
+    "temple": 1.0,
+    "shrine": 1.0,
+    "hike": 0.85,
+    "shop": 1.1,
+    "activity": 1.1,
+    "hotel": 0.7,
+    "landmark": 1,
 }
 
-DIVERSITY_TYPES = {"temple", "shrine", "museum"}
+DIVERSITY_TYPES = {}
 
 
 @dataclass(frozen=True)

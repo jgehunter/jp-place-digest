@@ -64,7 +64,7 @@ in Japan. The entity must be a named place (not just a city or neighborhood).
 
 A valid mention MUST:
 - Describe a concrete action taken or recommended at that entity (e.g. eat, stay, visit, soak, buy).
-- Include a location_hint with at least a city (always include the city name).
+- Include a location_hint with geographic context (city/town/island/prefecture).
 - Be based on real experience or a clear recommendation, not plans, questions, or hypotheticals.
 
 Exclude mentions that:
@@ -92,7 +92,7 @@ OUTPUT SCHEMA
       "entity_type": "restaurant | cafe | bar | shop | onsen | museum | hike | hotel | landmark | activity | other",
       "experience_text": "1-2 sentences: what to do + why",
       "recommendation_score": 0-10,
-      "location_hint": "City/Base/Area/Station",
+      "location_hint": "Town/City/Island, Prefecture/Region",
       "location_confidence": 0.0-1.0,
       "evidence_spans": ["short verbatim quote", "short verbatim quote"],
       "negative_or_caution": "optional caution text or null",
@@ -108,10 +108,12 @@ FIELD RULES
 ====================
 
 location_hint:
-- Provide the smallest specific location that can be supported by the text context.
-- Always include the city name; if only a station/area is mentioned, include the city too.
-- Prefer city/base/ward/neighborhood. If only a broader area is mentioned, use that.
-- Do not return only "Japan" or a continent.
+- Provide specific geographic context: Town/City/Island, Prefecture/Region
+- For urban areas: Use "City, Ward/Neighborhood" (e.g., "Kyoto, Gion")
+- For rural/island locations: Use "Town/Island, Prefecture" (e.g., "Naoshima, Kagawa" or "Oboke, Tokushima")
+- For multi-location entities (hiking routes, bike routes): Use "Area/Route, Prefecture(s)" (e.g., "Shimanami Kaido, Hiroshima-Ehime")
+- Always include prefecture/region for places outside major cities
+- Do not return only "Japan" or a continent
 
 experience_text:
 - 1-2 sentences, factual, no hype.
@@ -130,10 +132,12 @@ entity_name:
 
 entity_type:
 - Choose the most specific applicable type.
+- Use "activity" for multi-day routes, cycling routes, hiking trails.
 - Use "other" only if none apply.
 
 location_confidence:
-- Your certainty that the location_hint is correct.
+- Your certainty that the location_hint is correct and complete.
+- Use lower confidence (0.3-0.6) if only vague location context is given.
 
 evidence_spans:
 - 1-2 short verbatim snippets from the text.
@@ -141,8 +145,21 @@ evidence_spans:
 - No URLs, no paraphrasing.
 
 assigned_base:
-- Choose the best base from the list, or Unknown if it is not near enough.
-- If Unknown, do not include the mention in output.
+- Assign to the CLOSEST base from the list based on geographic proximity.
+- For entities between two bases, choose the one mentioned most in the text or the closer one.
+- For multi-location routes/activities, assign to the base serving as the most logical starting point or hub.
+- Examples:
+  * Naoshima island → Takamatsu (ferry hub to art islands)
+  * Shimanami Kaido → Matsuyama (Ehime end of route)
+  * Iya Valley attractions → Iya Valley base
+  * Oboke Gorge → Iya Valley (mountain region of Tokushima)
+- If not near any base (>100km from all), use "Unknown" and exclude the mention.
+
+assigned_base_confidence:
+- How confident you are in the base assignment.
+- Use high confidence (0.8-1.0) if the entity or its aliases appear in the base list.
+- Use medium confidence (0.5-0.7) if geographic proximity is clear from context.
+- Use lower confidence (0.3-0.5) if the entity could reasonably be accessed from multiple bases.
 
 ====================
 STRICT RULES
