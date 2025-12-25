@@ -12,6 +12,8 @@ src/jp_digest/connectors/__init__.py
 src/jp_digest/connectors/reddit.py
 src/jp_digest/core/__init__.py
 src/jp_digest/core/config.py
+src/jp_digest/core/queries.py
+src/jp_digest/core/textnorm.py
 src/jp_digest/services/__init__.py
 src/jp_digest/services/digest.py
 src/jp_digest/services/extraction.py

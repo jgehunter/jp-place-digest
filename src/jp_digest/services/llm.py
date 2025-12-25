@@ -1,8 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
-import os
 import logging
+import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -18,104 +18,138 @@ def _client() -> OpenAI:
     return OpenAI()
 
 
-def extract_experiences(text: str) -> dict:
+def extract_experiences(text: str, bases: list[dict[str, list[str]]]) -> dict:
     """
     Return JSON dict:
     {
-      "experiences": [
-        {"polarity","activity_type","place_mentions","summary","confidence","recommendation_score","evidence"},
+      "mentions": [
+        {
+          "entity_name",
+          "entity_type",
+          "experience_text",
+          "recommendation_score",
+          "location_hint",
+          "location_confidence",
+          "evidence_spans",
+          "negative_or_caution",
+          "canonicalization_hint",
+          "assigned_base",
+          "assigned_base_confidence"
+        },
         ...
       ]
     }
     """
-    instructions = """
-You extract TRAVEL EXPERIENCES from Reddit text.
+    base_names = [b["name"] for b in bases]
+    base_list = "\n".join(
+        f"- {b['name']} (aliases/kanji: {', '.join(b.get('aliases') or ['-'])})"
+        for b in bases
+    )
+    base_enum = " | ".join(base_names + ["Unknown"])
+
+    instructions = f"""
+You extract EXPERIENCE MENTIONS from Reddit text.
 
 Return ONLY valid JSON. No prose, no markdown.
 
-If no valid experiences are found, return:
-{"experiences": []}
+If no valid mentions are found, return:
+{{"mentions": []}}
 
 ====================
 DEFINITION
 ====================
-An experience is a concrete, first-hand, actionable statement describing something the author did at a specific, named Point of Interest (POI).
+An experience mention is a concrete, actionable statement describing
+something the author did OR explicitly recommends doing at a specific named entity
+in Japan. The entity must be a named place (not just a city or neighborhood).
 
-A valid experience MUST:
-- Mention at least one specific POI by proper name.
-- Describe a concrete action taken at that POI (e.g. ate, stayed, visited, soaked, bought).
-- Be based on real experience, not plans, questions, or hypotheticals.
+A valid mention MUST:
+- Describe a concrete action taken or recommended at that entity (e.g. eat, stay, visit, soak, buy).
+- Include a location_hint with at least a city (always include the city name).
+- Be based on real experience or a clear recommendation, not plans, questions, or hypotheticals.
 
-Exclude experiences that:
-- Mention only broad or administrative areas (e.g. "Kyoto", "Tokyo", "Shibuya", "Iya Valley").
+Exclude mentions that:
+- Do not specify any location or only name the country/continent (e.g. "Japan", "Asia").
 - Use only generic nouns (e.g. "a ramen shop", "a temple", "a bar").
-- Refer to chain retail or convenience stores (e.g. Uniqlo, GU, 7-Eleven, Lawson, FamilyMart).
-- Do not clearly identify the POI name.
+- Use generic location names as the entity (e.g. city/ward names like "Kyoto", "Shibuya").
+- Are only plans, questions, or wishlists without a clear recommendation.
 
-If the POI name is ambiguous, incomplete, or uncertain, EXCLUDE the experience entirely.
+If the entity name is ambiguous, incomplete, or uncertain, exclude the mention.
+
+====================
+BASE LIST (IN ORDER)
+====================
+{base_list}
+
+assigned_base must be one of: {base_enum}
 
 ====================
 OUTPUT SCHEMA
 ====================
-{
-  "experiences": [
-    {
-      "polarity": "positive | negative | neutral",
-      "activity_type": "restaurant | cafe | bar | onsen | museum | hotel | landmark | shop | activity | other",
-      "place_mentions": ["Proper POI Name"],
-      "summary": "<= 220 characters, factual, neutral tone, no hype>",
-      "confidence": 0.0-1.0,
+{{
+  "mentions": [
+    {{
+      "entity_name": "Proper named entity (not a city)",
+      "entity_type": "restaurant | cafe | bar | shop | onsen | museum | hike | hotel | landmark | activity | other",
+      "experience_text": "1-2 sentences: what to do + why",
       "recommendation_score": 0-10,
-      "evidence": ["short verbatim quote", "short verbatim quote"]
-    }
+      "location_hint": "City/Base/Area/Station",
+      "location_confidence": 0.0-1.0,
+      "evidence_spans": ["short verbatim quote", "short verbatim quote"],
+      "negative_or_caution": "optional caution text or null",
+      "canonicalization_hint": "optional canonical name or null",
+      "assigned_base": "{base_enum}",
+      "assigned_base_confidence": 0.0-1.0
+    }}
   ]
-}
+}}
 
 ====================
 FIELD RULES
 ====================
 
-polarity:
-- positive: clearly favorable experience
-- negative: clearly unfavorable experience
-- neutral: factual description with little or no sentiment
+location_hint:
+- Provide the smallest specific location that can be supported by the text context.
+- Always include the city name; if only a station/area is mentioned, include the city too.
+- Prefer city/base/ward/neighborhood. If only a broader area is mentioned, use that.
+- Do not return only "Japan" or a continent.
 
-activity_type:
+experience_text:
+- 1-2 sentences, factual, no hype.
+- Describe the specific action or recommendation and why it stood out.
+
+recommendation_score:
+- 0-2: caution/avoid or clearly not recommended.
+- 3-4: mixed or lukewarm.
+- 5-6: neutral or mild recommendation.
+- 7-8: strong recommendation with clear positives.
+- 9-10: standout/must-do, repeated praise or emphatic endorsement.
+
+entity_name:
+- Must be a named place (not a city/ward/area).
+- Do NOT output generic locations or base names.
+
+entity_type:
 - Choose the most specific applicable type.
 - Use "other" only if none apply.
 
-place_mentions:
-- Must contain only proper names or distinct official labels.
-- Do not include uncertain, partial, or inferred names.
-- At least one entry is required for a valid experience.
+location_confidence:
+- Your certainty that the location_hint is correct.
 
-summary:
-- Max 220 characters.
-- Describe the specific action at the POI.
-- Factual, descriptive, no promotional language.
-
-confidence:
-- Your certainty that the experience is real, specific, and correctly extracted.
-- 1.0 = explicit, unambiguous first-hand experience
-- 0.5 = some ambiguity but still credible
-
-recommendation_score:
-- How compelling the recommendation is overall.
-- Anchors:
-  - 0-3: avoid / weak / negative
-  - 4-6: mixed or average
-  - 7-10: strong recommendation
-
-evidence:
+evidence_spans:
 - 1-2 short verbatim snippets from the text.
-- Each snippet ≤ 20 words.
+- Each snippet <= 20 words.
 - No URLs, no paraphrasing.
+
+assigned_base:
+- Choose the best base from the list, or Unknown if it is not near enough.
+- If Unknown, do not include the mention in output.
 
 ====================
 STRICT RULES
 ====================
 - Do NOT infer experiences not explicitly described.
-- Do NOT hallucinate POI names.
+- Do NOT hallucinate entity names.
+- Do NOT invent a location_hint; if not supported by context, exclude the mention.
 - Do NOT include commentary outside the JSON.
 - Output must be valid JSON and match the schema exactly.
 """.strip()
@@ -146,8 +180,8 @@ STRICT RULES
         logger.error(f"JSON decode error: {e}")
         logger.error(f"LLM output was: {resp.output_text[:500]}")
         # Return empty result on parse failure
-        return {"experiences": []}
+        return {"mentions": []}
 
     except Exception as e:
         logger.error(f"Error calling LLM: {e}")
-        return {"experiences": []}
+        return {"mentions": []}

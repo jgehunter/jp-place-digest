@@ -1,16 +1,26 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
+import re
 
 from sqlalchemy import delete, select
 
+from jp_digest.core.config import AppCfg, BaseCfg
 from jp_digest.services.llm import extract_experiences
 from jp_digest.storage.db import session_scope
-from jp_digest.storage.models import ContentItem, Experience, ExperiencePoi
+from jp_digest.storage.models import (
+    ContentItem,
+    ExperienceClusterMention,
+    ExperienceMention,
+)
 
-
-_ALLOWED_POLARITY = {"positive", "negative"}
 _MAX_EVIDENCE = 2
+
+_GENERIC_ENTITY_NAMES = {
+    "japan",
+    "nihon",
+    "nippon",
+}
 
 
 def _content_to_prompt(ci: ContentItem) -> str:
@@ -34,7 +44,7 @@ TEXT:
     )
 
 
-def _clean_evidence(value: object) -> list[str]:
+def _clean_evidence_spans(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     out: list[str] = []
@@ -48,15 +58,83 @@ def _clean_evidence(value: object) -> list[str]:
     return out
 
 
-def extract_for_new_content(limit: int = 120, reextract_all: bool = False) -> int:
+def _clean_location_hint(value: object) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, list):
+        parts = [str(item).strip() for item in value if str(item).strip()]
+        return "; ".join(parts)
+    return str(value).strip()
+
+
+def _clean_optional_text(value: object) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _parse_float(value: object, default: float = 0.5) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _normalize_token(value: str) -> str:
+    value = value.lower().strip()
+    value = re.sub(r"[^\w\s]", " ", value)
+    value = re.sub(r"\s+", " ", value)
+    return value.strip()
+
+
+def _build_base_tokens(bases: list[BaseCfg]) -> set[str]:
+    tokens: set[str] = set()
+    for b in bases:
+        tokens.add(_normalize_token(b.name))
+        for alias in b.aliases:
+            tokens.add(_normalize_token(alias))
+    tokens = {t for t in tokens if t}
+    return tokens
+
+
+def _is_generic_entity_name(value: str, base_tokens: set[str]) -> bool:
+    norm = _normalize_token(value)
+    if not norm:
+        return True
+    if norm in base_tokens:
+        return True
+    if norm in _GENERIC_ENTITY_NAMES:
+        return True
+    return False
+
+
+def _bases_payload(cfg: AppCfg) -> list[dict[str, list[str]]]:
+    return [
+        {
+            "name": b.name,
+            "aliases": list(b.aliases),
+        }
+        for b in cfg.trip.bases
+    ]
+
+
+def extract_for_new_content(
+    cfg: AppCfg, limit: int = 120, reextract_all: bool = False
+) -> int:
     """
-    Extract experiences for content items that have none yet.
+    Extract experience mentions for content items that have none yet.
     """
     created = 0
+    base_tokens = _build_base_tokens(cfg.trip.bases)
+    base_names = {b.name for b in cfg.trip.bases}
+    base_lookup = {b.name.lower(): b.name for b in cfg.trip.bases}
+    bases_payload = _bases_payload(cfg)
+
     with session_scope() as s:
         stmt = select(ContentItem).order_by(ContentItem.id.desc())
         if not reextract_all:
-            stmt = stmt.where(~ContentItem.experiences.any()).limit(limit)
+            stmt = stmt.where(~ContentItem.mentions.any()).limit(limit)
         items = s.execute(stmt).scalars().all()
 
         total = len(items)
@@ -68,73 +146,100 @@ def extract_for_new_content(limit: int = 120, reextract_all: bool = False) -> in
             )
 
             if reextract_all:
-                exp_ids = (
+                mention_ids = (
                     s.execute(
-                        select(Experience.id).where(Experience.content_item_id == ci.id)
+                        select(ExperienceMention.id).where(
+                            ExperienceMention.content_item_id == ci.id
+                        )
                     )
                     .scalars()
                     .all()
                 )
-                if exp_ids:
+                if mention_ids:
                     s.execute(
-                        delete(ExperiencePoi).where(
-                            ExperiencePoi.experience_id.in_(exp_ids)
+                        delete(ExperienceClusterMention).where(
+                            ExperienceClusterMention.mention_id.in_(mention_ids)
                         )
                     )
-                s.execute(delete(Experience).where(Experience.content_item_id == ci.id))
+                s.execute(
+                    delete(ExperienceMention).where(
+                        ExperienceMention.content_item_id == ci.id
+                    )
+                )
 
-            payload = extract_experiences(_content_to_prompt(ci))
+            payload = extract_experiences(_content_to_prompt(ci), bases_payload)
             item_created = 0
 
-            for e in payload.get("experiences", []):
-                # Basic validation only - trust the LLM to follow instructions
-                mentions = e.get("place_mentions") or []
-                if not mentions:
+            for m in payload.get("mentions", []):
+                entity_name = str(m.get("entity_name") or "").strip()
+                if not entity_name or _is_generic_entity_name(entity_name, base_tokens):
                     continue
 
-                summary = str(e.get("summary") or "").strip()
-                if not summary:
+                entity_type = str(m.get("entity_type") or "other").lower().strip()
+                if not entity_type:
                     continue
 
-                polarity = str(e.get("polarity") or "").lower().strip()
-                if polarity not in _ALLOWED_POLARITY:
+                experience_text = str(m.get("experience_text") or "").strip()
+                if not experience_text:
                     continue
 
-                # Use LLM's scores as-is (they should follow the schema)
-                rec_score = float(e.get("recommendation_score", 0.0))
+                location_hint = _clean_location_hint(m.get("location_hint"))
+                if not location_hint:
+                    continue
+
+                location_confidence = _parse_float(m.get("location_confidence"), 0.5)
+                location_confidence = max(0.0, min(1.0, location_confidence))
+
+                assigned_base_raw = str(m.get("assigned_base") or "").strip()
+                if not assigned_base_raw or assigned_base_raw == "Unknown":
+                    continue
+                assigned_base = base_lookup.get(assigned_base_raw.lower())
+                if not assigned_base or assigned_base not in base_names:
+                    continue
+
+                assigned_base_confidence = _parse_float(
+                    m.get("assigned_base_confidence"), 0.5
+                )
+                assigned_base_confidence = max(
+                    0.0, min(1.0, assigned_base_confidence)
+                )
+
+                rec_score = _parse_float(m.get("recommendation_score"), 0.0)
                 rec_score = max(0.0, min(10.0, rec_score))
 
-                conf = float(e.get("confidence", 0.5))
-                conf = max(0.0, min(1.0, conf))
-
-                # Clean up mentions
-                mentions = [str(m).strip() for m in mentions if str(m).strip()]
-                mentions = list(dict.fromkeys(mentions))  # Remove duplicates
-                if not mentions:
-                    continue
-
-                evidence = _clean_evidence(e.get("evidence"))
+                evidence_spans = _clean_evidence_spans(m.get("evidence_spans"))
                 evidence_json = (
-                    json.dumps(evidence, ensure_ascii=True) if evidence else None
+                    json.dumps(evidence_spans, ensure_ascii=True)
+                    if evidence_spans
+                    else None
                 )
 
-                exp = Experience(
-                    content_item_id=ci.id,
-                    polarity=polarity[:16],
-                    activity_type=str(e.get("activity_type") or "other")[:32],
-                    summary=summary,
-                    confidence=conf,
-                    recommendation_score=rec_score,
-                    evidence=evidence_json,
-                    place_mentions="; ".join(mentions),
+                negative_or_caution = _clean_optional_text(m.get("negative_or_caution"))
+                canonicalization_hint = _clean_optional_text(
+                    m.get("canonicalization_hint")
                 )
-                s.add(exp)
+
+                mention = ExperienceMention(
+                    content_item_id=ci.id,
+                    entity_name=entity_name[:256],
+                    entity_type=entity_type[:48],
+                    experience_text=experience_text,
+                    recommendation_score=rec_score,
+                    location_hint=location_hint,
+                    location_confidence=location_confidence,
+                    evidence_spans=evidence_json,
+                    negative_or_caution=negative_or_caution,
+                    canonicalization_hint=canonicalization_hint,
+                    assigned_base=assigned_base[:128],
+                    assigned_base_confidence=assigned_base_confidence,
+                )
+                s.add(mention)
                 item_created += 1
                 created += 1
 
             if item_created > 0:
-                print(f"    ✓ Found {item_created} experiences (total: {created})")
+                print(f"    OK: Found {item_created} mentions (total: {created})")
             else:
-                print(f"    ⊙ No valid experiences found")
+                print("    OK: No valid mentions found")
 
     return created

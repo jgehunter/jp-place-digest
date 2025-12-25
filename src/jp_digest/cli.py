@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import argparse
 import json
@@ -9,8 +9,8 @@ from sqlalchemy import select
 from jp_digest.connectors.reddit import fetch_post_and_top_comments, search_posts
 from jp_digest.core.config import load_config
 from jp_digest.core.queries import expand_queries
-from jp_digest.services.extraction import extract_for_new_content
 from jp_digest.services.digest import build_weekly_digest
+from jp_digest.services.extraction import extract_for_new_content
 from jp_digest.services.grounding import ground_experiences
 from jp_digest.storage.db import session_scope
 from jp_digest.storage.models import ContentItem
@@ -48,7 +48,7 @@ def cmd_ingest(cfg_path: str) -> None:
                             sort=cfg.reddit.sort,
                             pause_seconds=cfg.reddit.pause_seconds,
                         )
-                        print(f"  → Found {len(hits)} posts")
+                        print(f"  OK: Found {len(hits)} posts")
 
                         for idx, h in enumerate(hits, 1):
                             if h.get("kind") != "t3":
@@ -71,7 +71,7 @@ def cmd_ingest(cfg_path: str) -> None:
                             if existing_post:
                                 skipped_existing_posts += 1
                                 print(
-                                    f"  [{idx}/{len(hits)}] ⊙ Already have: {permalink}"
+                                    f"  [{idx}/{len(hits)}] SKIP: Already have {permalink}"
                                 )
                                 continue
 
@@ -115,9 +115,7 @@ def cmd_ingest(cfg_path: str) -> None:
                                         author=item.author,
                                         title=item.title,
                                         body=item.body,
-                                        raw_json=json.dumps(
-                                            item.raw, ensure_ascii=True
-                                        ),
+                                        raw_json=json.dumps(item.raw, ensure_ascii=True),
                                         score=item.score,
                                         num_comments=item.num_comments,
                                         created_utc=item.created_utc,
@@ -130,41 +128,42 @@ def cmd_ingest(cfg_path: str) -> None:
                             s.commit()
                             if new_items > 0:
                                 print(
-                                    f"  ✓ Saved {new_items} new items (total: {added})"
+                                    f"  OK: Saved {new_items} new items (total: {added})"
                                 )
                             else:
-                                print(f"  ⊙ No new items from this post")
+                                print("  OK: No new items from this post")
 
-    print(f"\n✅ Ingestion complete!")
+    print("\nOK: Ingestion complete")
     print(f"   Added {added} new content items.")
     if skipped_existing_posts > 0:
         print(
-            f"   Skipped {skipped_existing_posts} posts already in database (saved time!)."
+            f"   Skipped {skipped_existing_posts} posts already in database (saved time)."
         )
     if skipped_comments > 0:
         print(f"   Filtered out {skipped_comments} low-quality comments.")
 
 
-def cmd_extract(reextract_all: bool = False) -> None:
-    print("🔍 Starting experience extraction...")
-    n = extract_for_new_content(limit=140, reextract_all=reextract_all)
-    print(f"✅ Extraction complete! Extracted {n} experiences.")
+def cmd_extract(cfg_path: str, reextract_all: bool = False) -> None:
+    print("Starting mention extraction...")
+    cfg = load_config(cfg_path)
+    n = extract_for_new_content(cfg, limit=140, reextract_all=reextract_all)
+    print(f"OK: Extraction complete. Extracted {n} mentions.")
 
 
 def cmd_ground(cfg_path: str) -> None:
-    print("📍 Starting POI grounding...")
+    print("Starting base gating + clustering...")
     cfg = load_config(cfg_path)
-    n = ground_experiences(cfg, limit_experiences=500)
-    print(f"✅ Grounding complete! Created {n} experience→POI links.")
+    n = ground_experiences(cfg, limit_mentions=500)
+    print(f"OK: Clustering complete. Created {n} clusters.")
 
 
 def cmd_digest(cfg_path: str, out: str | None) -> None:
-    print("📝 Building digest...")
+    print("Starting digest build...")
     cfg = load_config(cfg_path)
     md = build_weekly_digest(cfg)
     if out:
         Path(out).write_text(md, encoding="utf-8")
-        print(f"✅ Digest written to: {out}")
+        print(f"OK: Digest written to: {out}")
     else:
         print("\n" + "=" * 80)
         print(md)
@@ -182,7 +181,7 @@ def main() -> None:
     p_extract.add_argument(
         "--reextract-all",
         action="store_true",
-        help="Re-extract experiences for all content items.",
+        help="Re-extract mentions for all content items.",
     )
     sub.add_parser("ground")
 
@@ -194,7 +193,7 @@ def main() -> None:
     if args.cmd == "ingest":
         cmd_ingest(args.config)
     elif args.cmd == "extract":
-        cmd_extract(reextract_all=args.reextract_all)
+        cmd_extract(args.config, reextract_all=args.reextract_all)
     elif args.cmd == "ground":
         cmd_ground(args.config)
     elif args.cmd == "digest":

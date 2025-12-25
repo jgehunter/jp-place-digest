@@ -50,20 +50,25 @@ class ContentItem(Base):
         DateTime(timezone=True), default=datetime.utcnow, nullable=False
     )
 
-    experiences: Mapped[list["Experience"]] = relationship(
+    mentions: Mapped[list["ExperienceMention"]] = relationship(
         back_populates="content_item",
         cascade="all, delete-orphan",
     )
 
 
-class Experience(Base):
+class ExperienceMention(Base):
     """
-    Extracted experience from content.
+    Extracted experience mention, base-aware and entity-focused.
     """
 
-    __tablename__ = "experiences"
+    __tablename__ = "experience_mentions"
     __table_args__ = (
-        UniqueConstraint("content_item_id", "summary", name="uq_exp_content_summary"),
+        UniqueConstraint(
+            "content_item_id",
+            "entity_name",
+            "experience_text",
+            name="uq_mention_content_entity_text",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -71,93 +76,94 @@ class Experience(Base):
         ForeignKey("content_items.id"), index=True, nullable=False
     )
 
-    polarity: Mapped[str] = mapped_column(String(16), nullable=False)
-    activity_type: Mapped[str] = mapped_column(String(32), nullable=False)
-    summary: Mapped[str] = mapped_column(Text, nullable=False)
-    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
-
+    entity_name: Mapped[str] = mapped_column(String(256), nullable=False)
+    entity_type: Mapped[str] = mapped_column(String(48), nullable=False)
+    experience_text: Mapped[str] = mapped_column(Text, nullable=False)
     recommendation_score: Mapped[float] = mapped_column(
         Float, nullable=False, default=0.0
     )
-    evidence: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    place_mentions: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    location_hint: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    location_confidence: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0.5
+    )
+
+    evidence_spans: Mapped[str | None] = mapped_column(Text, nullable=True)
+    negative_or_caution: Mapped[str | None] = mapped_column(Text, nullable=True)
+    canonicalization_hint: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    assigned_base: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    assigned_base_confidence: Mapped[float] = mapped_column(
+        Float, nullable=False, default=0.5
+    )
 
     extracted_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, nullable=False
     )
 
-    content_item: Mapped["ContentItem"] = relationship(back_populates="experiences")
+    content_item: Mapped["ContentItem"] = relationship(back_populates="mentions")
 
 
-class Poi(Base):
+class ExperienceCluster(Base):
     """
-    Canonical grounded place. For Phase 1 we use Nominatim.
-    """
-
-    __tablename__ = "pois"
-
-    poi_id: Mapped[str] = mapped_column(String(160), primary_key=True)  # nominatim:...
-    provider: Mapped[str] = mapped_column(String(32), nullable=False)  # nominatim
-    name: Mapped[str] = mapped_column(String(256), nullable=False)
-
-    lat: Mapped[float] = mapped_column(Float, nullable=False)
-    lon: Mapped[float] = mapped_column(Float, nullable=False)
-
-    address: Mapped[str | None] = mapped_column(Text, nullable=True)
-    category: Mapped[str | None] = mapped_column(String(64), nullable=True)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=datetime.utcnow, nullable=False
-    )
-
-
-class ExperiencePoi(Base):
-    """
-    Links an experience mention -> grounded POI.
+    Clustered experience entity for ranking and digest.
     """
 
-    __tablename__ = "experience_pois"
+    __tablename__ = "experience_clusters"
     __table_args__ = (
         UniqueConstraint(
-            "experience_id", "poi_id", "mention_text", name="uq_exp_poi_mention"
+            "base_name",
+            "normalized_key",
+            "entity_type",
+            name="uq_cluster_base_key_type",
         ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    experience_id: Mapped[int] = mapped_column(
-        ForeignKey("experiences.id"), index=True, nullable=False
-    )
-    poi_id: Mapped[str] = mapped_column(
-        ForeignKey("pois.poi_id"), index=True, nullable=False
-    )
+    base_name: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
+    canonical_name: Mapped[str] = mapped_column(String(256), nullable=False)
+    entity_type: Mapped[str] = mapped_column(String(48), nullable=False)
+    normalized_key: Mapped[str] = mapped_column(String(256), nullable=False)
 
-    mention_text: Mapped[str] = mapped_column(String(256), nullable=False)
-    link_confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.7)
+    support_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    engagement_sum: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    recency_score: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, nullable=False
     )
 
+    mentions: Mapped[list["ExperienceClusterMention"]] = relationship(
+        back_populates="cluster",
+        cascade="all, delete-orphan",
+    )
 
-class BaseAssignment(Base):
+
+class ExperienceClusterMention(Base):
     """
-    Assign a POI to a trip base with distance.
+    Join table for cluster <-> mention.
     """
 
-    __tablename__ = "base_assignments"
-    __table_args__ = (UniqueConstraint("base_name", "poi_id", name="uq_base_poi"),)
+    __tablename__ = "experience_cluster_mentions"
+    __table_args__ = (
+        UniqueConstraint("cluster_id", "mention_id", name="uq_cluster_mention"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    base_name: Mapped[str] = mapped_column(String(128), index=True, nullable=False)
-    poi_id: Mapped[str] = mapped_column(
-        ForeignKey("pois.poi_id"), index=True, nullable=False
+    cluster_id: Mapped[int] = mapped_column(
+        ForeignKey("experience_clusters.id"), index=True, nullable=False
     )
-    distance_km: Mapped[float] = mapped_column(Float, nullable=False)
+    mention_id: Mapped[int] = mapped_column(
+        ForeignKey("experience_mentions.id"), index=True, nullable=False
+    )
 
-    assigned_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=datetime.utcnow, nullable=False
     )
+
+    cluster: Mapped["ExperienceCluster"] = relationship(back_populates="mentions")
+    mention: Mapped["ExperienceMention"] = relationship()
 
 
 Index("ix_content_items_subreddit", ContentItem.subreddit)
